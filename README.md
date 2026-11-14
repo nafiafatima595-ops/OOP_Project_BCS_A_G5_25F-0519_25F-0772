@@ -1,2 +1,14 @@
-# oop-semester-project-
-C++ OOP semester project demonstrating key Object-Oriented Programming concepts, including Encapsulation, Inheritance, Polymorphism, file handling for persistent data storage, and dynamic memory management with a structured console interface.
+# The Locker Heist
+A C++ console detective game built with OOP principles.
+
+## Team Members
+- Nafia (25F-0519)
+- Samreen (25F-0772)
+
+Section: A
+
+## Build and Run
+Open LockerHeist/LockerHeist.slnx in Visual Studio, build the solution, and run with Ctrl+F5.
+
+## Known Limitations
+To be updated at the end of the project.
