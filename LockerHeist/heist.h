@@ -1,6 +1,6 @@
 // heist.h
 // Header file of The Locker Heist game.
-// It contains the declarations of all enumerations, structures and (in later modules) classes.
+// It contains the declarations of all enumerations, structures and classes.
 
 #ifndef HEIST_H
 #define HEIST_H
@@ -70,6 +70,83 @@ struct Location
     int boardPosLoc;        // Position of that letter on the board
     WordRow locRow;         // Row (word) to which the letter belongs
     bool locSearchFlag;     // True if the detective has already searched this location
+};
+
+// ======================= CLASSES =======================
+
+// Character is the abstract base class of every person in the game.
+// It stores the attributes that are common to all people, and it forces every
+// derived class to override display() and getMinCredibility() (pure virtual functions).
+class Character
+{
+protected:
+    string characterName;    // Name of the person
+    string characterRole;    // Role of the person, e.g. Victim, Cook, Detective
+    string nationality;      // Nationality of the person
+    bool isCulprit;          // True only for the person who committed the theft
+
+    // Prints the information that is common for all characters (helper for display functions)
+    void printBasicInfo() const;
+
+public:
+    Character(string name = "", string role = "", string nation = "", bool culprit = false);
+
+    // Virtual destructor makes sure that the destructor of the derived class also runs
+    // when an object is deleted through a Character pointer.
+    virtual ~Character();
+
+    // Pure virtual functions: they make Character abstract and enable runtime polymorphism.
+    virtual void display() const = 0;               // Shows the character on the screen
+    virtual int getMinCredibility() const = 0;      // Credibility needed to interview this character
+
+    // Getters and setters (encapsulation: data is accessed only through these functions)
+    string getName() const;
+    string getRole() const;
+    string getNationality() const;
+    bool getIsCulprit() const;
+    void setNationality(string nation);
+    void setIsCulprit(bool culprit);
+};
+
+// Victim is the French business owner. He is interviewed by the detective but is not a suspect.
+// He gives one letter of Word 2 together with its board position.
+class Victim : public Character
+{
+private:
+    char letterClueChar;     // Letter given by the victim
+    int boardPosChar;        // Board position of that letter
+    WordRow clueRowChar;     // Row of that letter (always Word 2)
+
+public:
+    Victim(string name = "", string nation = "", char letter = ' ', int pos = 0, WordRow row = WORD_2);
+
+    void display() const override;
+    int getMinCredibility() const override;    // Victim can be interviewed only if credibility >= 80
+
+    char getLetter() const;
+    int getPosition() const;
+    WordRow getRow() const;
+};
+
+// Detective is the player. It stores only its own credibility, the turn count and the solved words.
+// The turns are incremented by the GameEngine, the detective only stores the count.
+class Detective : public Character
+{
+private:
+    int credibility;         // Reduces with every wrong step, game is lost when it reaches zero
+    int turns;               // Number of turns used so far
+    string solvedWords;      // Words that the detective has formed correctly
+
+public:
+    Detective(string name = "", int startCredibility = 100);
+
+    void display() const override;
+    int getMinCredibility() const override;    // Detective is never interviewed, so it returns 0
+
+    void loseCredibility(int amount);          // Reduces credibility, it never goes below zero
+    void useTurn();                            // Increases the turn count by one
+    int getCredibility() const;
+    int getTurns() const;
 };
 
 #endif
