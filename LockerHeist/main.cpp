@@ -30,12 +30,12 @@ int main()
     agent.loseCredibility(5);
     agent.useTurn();
     cout << "After one wrong turn: Credibility = " << agent.getCredibility()
-         << ", Turns = " << agent.getTurns() << endl;
+        << ", Turns = " << agent.getTurns() << endl;
 
     // Show the clue stored inside the victim
     cout << "Victim clue: letter = " << leonardo.getLetter()
-         << ", position = " << leonardo.getPosition()
-         << ", row = " << static_cast<int>(leonardo.getRow()) << endl;
+        << ", position = " << leonardo.getPosition()
+        << ", row = " << static_cast<int>(leonardo.getRow()) << endl;
 
     // Step B test: three house help members are used through Character pointers (polymorphism)
     cout << "--- Module 3 Test (Step B: Suspect, HouseHelp, Cook, Guard, Servant) ---" << endl;
@@ -50,8 +50,8 @@ int main()
         cout << "  Minimum credibility to interview: " << houseHelp[i]->getMinCredibility() << endl;
     }
     cout << "Cook clue: letter = " << enzo.getLetter()
-         << ", position = " << enzo.getPosition()
-         << ", row = " << static_cast<int>(enzo.getRow()) << endl;
+        << ", position = " << enzo.getPosition()
+        << ", row = " << static_cast<int>(enzo.getRow()) << endl;
 
     // Step C test: two partners and the child are used through Character pointers (polymorphism)
     cout << "--- Module 3 Test (Step C: BusinessRelations, Partner, CloseRelations, Child) ---" << endl;
@@ -66,8 +66,18 @@ int main()
         cout << "  Minimum credibility to interview: " << relations[i]->getMinCredibility() << endl;
     }
     cout << "Partner clue: letter = " << ruslana.getLetter()
-         << ", position = " << ruslana.getPosition()
-         << ", row = " << static_cast<int>(ruslana.getRow()) << endl;
+        << ", position = " << ruslana.getPosition()
+        << ", row = " << static_cast<int>(ruslana.getRow()) << endl;
+
+    // Step D test: the PA is used through a Character pointer
+    cout << "--- Module 3 Test (Step D: PA with virtual inheritance) ---" << endl;
+    PA jad("Mr.Jad", "Egyptian", false, 'I', 8, WORD_2);
+    Character* assistant = &jad;
+    assistant->display();
+    cout << "  Minimum credibility to interview: " << assistant->getMinCredibility() << endl;
+    cout << "PA clue: letter = " << jad.getLetter()
+        << ", position = " << jad.getPosition()
+        << ", row = " << static_cast<int>(jad.getRow()) << endl;
 
     // Pause the program so that the output stays visible until a key is pressed
     system("pause");

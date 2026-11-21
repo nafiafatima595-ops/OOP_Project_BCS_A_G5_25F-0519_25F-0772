@@ -161,7 +161,7 @@ protected:
 
 public:
     Suspect(string name = "", string role = "", string nation = "", bool culprit = false,
-            char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
     virtual ~Suspect();
 
     char getLetter() const;
@@ -174,7 +174,7 @@ class HouseHelp : public Suspect
 {
 public:
     HouseHelp(string name = "", string role = "", string nation = "", bool culprit = false,
-              char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
 
     void display() const override;
     int getMinCredibility() const override;    // No credibility is required for house help
@@ -185,7 +185,7 @@ class Cook : public HouseHelp
 {
 public:
     Cook(string name = "", string nation = "", bool culprit = false,
-         char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
     void display() const override;
 };
 
@@ -194,7 +194,7 @@ class Guard : public HouseHelp
 {
 public:
     Guard(string name = "", string nation = "", bool culprit = false,
-          char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
     void display() const override;
 };
 
@@ -203,7 +203,7 @@ class Servant : public HouseHelp
 {
 public:
     Servant(string name = "", string nation = "", bool culprit = false,
-            char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
     void display() const override;
 };
 
@@ -216,7 +216,7 @@ class BusinessRelations : virtual public Suspect
 {
 public:
     BusinessRelations(string name = "", string role = "", string nation = "", bool culprit = false,
-                      char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
 };
 
 // Partner is a business partner of the owner (Partner 1 or Partner 2)
@@ -224,7 +224,7 @@ class Partner : public BusinessRelations
 {
 public:
     Partner(string name = "", string role = "Partner 1", string nation = "", bool culprit = false,
-            char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
 
     void display() const override;
     int getMinCredibility() const override;    // Partner can be interviewed only if credibility >= 50
@@ -236,7 +236,7 @@ class CloseRelations : virtual public Suspect
 {
 public:
     CloseRelations(string name = "", string role = "", string nation = "", bool culprit = false,
-                   char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
 };
 
 // Child is the child of the owner
@@ -244,10 +244,23 @@ class Child : public CloseRelations
 {
 public:
     Child(string name = "", string nation = "", bool culprit = false,
-          char letter = ' ', int pos = 0, WordRow row = WORD_2);
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
 
     void display() const override;
     int getMinCredibility() const override;    // Child can be interviewed only if credibility >= 75
+};
+
+// PA (Personal Assistant of the owner) is both a business relation and a close relation.
+// It inherits from BusinessRelations and CloseRelations. Both of them inherit virtually from Suspect,
+// so PA contains only ONE copy of Suspect. Without "virtual", getLetter() would be ambiguous.
+class PA : public BusinessRelations, public CloseRelations
+{
+public:
+    PA(string name = "", string nation = "", bool culprit = false,
+        char letter = ' ', int pos = 0, WordRow row = WORD_2);
+
+    void display() const override;
+    int getMinCredibility() const override;    // PA can be interviewed only if credibility >= 35
 };
 
 #endif

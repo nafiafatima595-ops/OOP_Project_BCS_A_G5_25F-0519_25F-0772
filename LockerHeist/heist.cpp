@@ -21,7 +21,7 @@ Character::~Character()
 void Character::printBasicInfo() const
 {
     cout << "Name: " << characterName << " | Role: " << characterRole
-         << " | Nationality: " << nationality;
+        << " | Nationality: " << nationality;
 }
 
 // Getters return the stored values without allowing direct access to the data
@@ -39,7 +39,7 @@ void Character::setIsCulprit(bool culprit) { isCulprit = culprit; }
 // The role of the victim is always "Victim" and he is never the culprit
 Victim::Victim(string name, string nation, char letter, int pos, WordRow row)
     : Character(name, "Victim", nation, false),
-      letterClueChar(letter), boardPosChar(pos), clueRowChar(row)
+    letterClueChar(letter), boardPosChar(pos), clueRowChar(row)
 {
 }
 
@@ -62,7 +62,7 @@ WordRow Victim::getRow() const { return clueRowChar; }
 // The detective starts with full credibility and zero turns
 Detective::Detective(string name, int startCredibility)
     : Character(name, "Detective", "", false),
-      credibility(startCredibility), turns(0), solvedWords("")
+    credibility(startCredibility), turns(0), solvedWords("")
 {
 }
 
@@ -97,7 +97,7 @@ int Detective::getTurns() const { return turns; }
 // Suspect passes the common data to Character and stores its own clue data
 Suspect::Suspect(string name, string role, string nation, bool culprit, char letter, int pos, WordRow row)
     : Character(name, role, nation, culprit),
-      letterClueChar(letter), boardPosChar(pos), clueRowChar(row)
+    letterClueChar(letter), boardPosChar(pos), clueRowChar(row)
 {
 }
 
@@ -178,7 +178,7 @@ BusinessRelations::BusinessRelations(string name, string role, string nation, bo
 // the constructor of the virtual base class Suspect directly.
 Partner::Partner(string name, string role, string nation, bool culprit, char letter, int pos, WordRow row)
     : Suspect(name, role, nation, culprit, letter, pos, row),
-      BusinessRelations(name, role, nation, culprit, letter, pos, row)
+    BusinessRelations(name, role, nation, culprit, letter, pos, row)
 {
 }
 
@@ -206,7 +206,7 @@ CloseRelations::CloseRelations(string name, string role, string nation, bool cul
 // The role of the child is always "Child". It also calls the virtual base class Suspect directly.
 Child::Child(string name, string nation, bool culprit, char letter, int pos, WordRow row)
     : Suspect(name, "Child", nation, culprit, letter, pos, row),
-      CloseRelations(name, "Child", nation, culprit, letter, pos, row)
+    CloseRelations(name, "Child", nation, culprit, letter, pos, row)
 {
 }
 
@@ -219,3 +219,24 @@ void Child::display() const
 
 // Rule of the game: the child can be interviewed only if credibility is 75 or more
 int Child::getMinCredibility() const { return 75; }
+
+// ======================= CLASS: PA =======================
+
+// PA is the most derived class of the diamond, so it calls the constructor of the
+// virtual base class Suspect directly. Then it calls both of its parent classes.
+PA::PA(string name, string nation, bool culprit, char letter, int pos, WordRow row)
+    : Suspect(name, "PA", nation, culprit, letter, pos, row),
+    BusinessRelations(name, "PA", nation, culprit, letter, pos, row),
+    CloseRelations(name, "PA", nation, culprit, letter, pos, row)
+{
+}
+
+// PA must override display() itself, because both parents leave it abstract
+void PA::display() const
+{
+    printBasicInfo();
+    cout << " | Business Relation and Close Relation" << endl;
+}
+
+// Rule of the game: the PA can be interviewed only if credibility is 35 or more
+int PA::getMinCredibility() const { return 35; }
