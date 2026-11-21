@@ -1,6 +1,6 @@
 // main.cpp
 // Driver file of The Locker Heist game.
-// For now it tests the Character hierarchy classes (Module 3).
+// For now it tests the Character hierarchy classes (Module 3) and the TileRack (Module 5).
 
 #include <iostream>
 #include <cstdlib>    // Needed for system("pause"), which keeps the console window open after the output
@@ -78,6 +78,60 @@ int main()
     cout << "PA clue: letter = " << jad.getLetter()
         << ", position = " << jad.getPosition()
         << ", row = " << static_cast<int>(jad.getRow()) << endl;
+
+    // Module 5 test: the tile rack, its exceptions and the deep copy
+    cout << "--- Module 5 Test (TileRack and exceptions) ---" << endl;
+    TileRack rack(3);            // A small rack, so that the "full" exception is easy to show
+    rack.display();
+    rack.addTile('S');
+    rack.addTile('P');
+    rack.addTile('A');
+    rack.display();
+
+    // Exceptions are caught in main(), as the project manual requires
+    try
+    {
+        rack.addTile('G');       // The rack is full, so this throws RackFullException
+    }
+    catch (GameException& error)
+    {
+        cout << error.what() << endl;
+    }
+
+    rack.removeTile('P');
+    rack.display();
+
+    try
+    {
+        rack.removeTile('Z');    // Z was never added, so this throws LetterNotFoundException
+    }
+    catch (GameException& error)
+    {
+        cout << error.what() << endl;
+    }
+
+    TileRack emptyRack(2);
+    try
+    {
+        emptyRack.removeTile('A');    // Nothing to remove, so this throws RackEmptyException
+    }
+    catch (GameException& error)
+    {
+        cout << error.what() << endl;
+    }
+
+    // Deep copy test: changing the copy must not change the original rack
+    TileRack copiedRack = rack;
+    copiedRack.addTile('Y');
+    cout << "Original ";
+    rack.display();
+    cout << "Copy     ";
+    copiedRack.display();
+
+    // The detective owns a rack too
+    agent.getRack().addTile('H');
+    cout << "Detective ";
+    agent.getRack().display();
 
     // Pause the program so that the output stays visible until a key is pressed
     system("pause");

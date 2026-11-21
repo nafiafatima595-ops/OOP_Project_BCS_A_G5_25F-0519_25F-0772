@@ -72,6 +72,70 @@ struct Location
     bool locSearchFlag;     // True if the detective has already searched this location
 };
 
+// ======================= EXCEPTIONS =======================
+
+// GameException is the base class of all exceptions of the game (Module 7 extends it later).
+// Every message starts with "HEIST ERROR". Exceptions are thrown by the classes and caught in main().
+class GameException
+{
+protected:
+    string message;    // Message that explains what went wrong
+
+public:
+    GameException(string msg = "HEIST ERROR: Something went wrong in the game.");
+    virtual ~GameException();
+    virtual string what() const;    // Returns the message of the exception
+};
+
+// RackFullException is thrown when a letter is added to a tile rack that has no free slot
+class RackFullException : public GameException
+{
+public:
+    RackFullException();
+};
+
+// RackEmptyException is thrown when a letter is removed from a tile rack that has no letters
+class RackEmptyException : public GameException
+{
+public:
+    RackEmptyException();
+};
+
+// LetterNotFoundException is thrown when the letter that should be removed is not in the rack
+class LetterNotFoundException : public GameException
+{
+public:
+    LetterNotFoundException(char letter);
+};
+
+// ======================= CLASS: TileRack =======================
+
+// TileRack stores the letters that the detective has collected.
+// It owns a dynamically allocated array of Tile, so it needs a destructor,
+// a copy constructor and an assignment operator to perform deep copies.
+class TileRack
+{
+private:
+    Tile* tiles;       // Dynamic array of tiles (heap memory)
+    int capacity;      // Maximum number of letters that the rack can store
+    int count;         // Number of letters stored so far
+
+public:
+    TileRack(int cap = 15);                      // Allocates the array
+    TileRack(const TileRack& other);             // Copy constructor: deep copy
+    TileRack& operator=(const TileRack& other);  // Assignment operator: deep copy
+    ~TileRack();                                 // Deletes the array
+
+    void addTile(char letter);       // Stores a letter, throws RackFullException if the rack is full
+    void removeTile(char letter);    // Removes a letter, throws RackEmptyException or LetterNotFoundException
+    void display() const;            // Shows every letter with its slot number
+
+    int getCount() const;
+    int getCapacity() const;
+    bool isFull() const;
+    bool isEmpty() const;
+};
+
 // ======================= CLASSES =======================
 
 // Character is the abstract base class of every person in the game.
@@ -136,6 +200,7 @@ private:
     int credibility;         // Reduces with every wrong step, game is lost when it reaches zero
     int turns;               // Number of turns used so far
     string solvedWords;      // Words that the detective has formed correctly
+    TileRack rack;           // Rack in which the detective keeps the collected letters
 
 public:
     Detective(string name = "", int startCredibility = 100);
@@ -147,6 +212,7 @@ public:
     void useTurn();                            // Increases the turn count by one
     int getCredibility() const;
     int getTurns() const;
+    TileRack& getRack();                       // Gives access to the rack of the detective
 };
 
 // Suspect is the abstract base class of the seven suspects.

@@ -4,6 +4,153 @@
 
 #include "heist.h"
 
+// ======================= EXCEPTIONS =======================
+
+// The base exception stores the message that is shown to the player
+GameException::GameException(string msg) : message(msg)
+{
+}
+
+GameException::~GameException()
+{
+}
+
+// Returns the message of the exception
+string GameException::what() const { return message; }
+
+RackFullException::RackFullException()
+    : GameException("HEIST ERROR: The tile rack is full, no more letters can be added.")
+{
+}
+
+RackEmptyException::RackEmptyException()
+    : GameException("HEIST ERROR: The tile rack is empty, there is no letter to remove.")
+{
+}
+
+LetterNotFoundException::LetterNotFoundException(char letter)
+    : GameException(string("HEIST ERROR: The letter ") + letter + " is not in the tile rack.")
+{
+}
+
+// ======================= CLASS: TileRack =======================
+
+// Constructor allocates the dynamic array. A capacity below one is corrected to one
+TileRack::TileRack(int cap)
+{
+    if (cap < 1)
+    {
+        cap = 1;
+    }
+    capacity = cap;
+    count = 0;
+    tiles = new Tile[capacity];
+    for (int i = 0; i < capacity; i++)
+    {
+        tiles[i].tileLetter = ' ';
+        tiles[i].filled = false;
+    }
+}
+
+// Copy constructor: it allocates a NEW array and copies every tile (deep copy),
+// so that two racks never share the same memory
+TileRack::TileRack(const TileRack& other)
+{
+    capacity = other.capacity;
+    count = other.count;
+    tiles = new Tile[capacity];
+    for (int i = 0; i < capacity; i++)
+    {
+        tiles[i] = other.tiles[i];
+    }
+}
+
+// Assignment operator: it first checks self-assignment, then frees the old array
+// and makes a deep copy of the other rack
+TileRack& TileRack::operator=(const TileRack& other)
+{
+    if (this != &other)
+    {
+        delete[] tiles;
+        capacity = other.capacity;
+        count = other.count;
+        tiles = new Tile[capacity];
+        for (int i = 0; i < capacity; i++)
+        {
+            tiles[i] = other.tiles[i];
+        }
+    }
+    return *this;
+}
+
+// Destructor releases the heap memory, so there is no memory leak
+TileRack::~TileRack()
+{
+    delete[] tiles;
+}
+
+// Stores a letter in the first free slot. A full rack throws an exception
+void TileRack::addTile(char letter)
+{
+    if (isFull())
+    {
+        throw RackFullException();
+    }
+    tiles[count].tileLetter = letter;
+    tiles[count].filled = true;
+    count++;
+}
+
+// Removes the first tile that contains the letter and moves the next tiles one slot to the left.
+// An empty rack or a missing letter throws an exception
+void TileRack::removeTile(char letter)
+{
+    if (isEmpty())
+    {
+        throw RackEmptyException();
+    }
+    int found = -1;
+    for (int i = 0; i < count && found == -1; i++)
+    {
+        if (tiles[i].tileLetter == letter)
+        {
+            found = i;
+        }
+    }
+    if (found == -1)
+    {
+        throw LetterNotFoundException(letter);
+    }
+    for (int i = found; i < count - 1; i++)
+    {
+        tiles[i] = tiles[i + 1];
+    }
+    count--;
+    tiles[count].tileLetter = ' ';
+    tiles[count].filled = false;
+}
+
+// Shows every letter with its slot number, e.g. [1:S] [2:P]
+void TileRack::display() const
+{
+    cout << "Rack: ";
+    if (isEmpty())
+    {
+        cout << "(empty)" << endl;
+        return;
+    }
+    for (int i = 0; i < count; i++)
+    {
+        cout << "[" << (i + 1) << ":" << tiles[i].tileLetter << "] ";
+    }
+    cout << endl;
+}
+
+int TileRack::getCount() const { return count; }
+int TileRack::getCapacity() const { return capacity; }
+bool TileRack::isFull() const { return count == capacity; }
+bool TileRack::isEmpty() const { return count == 0; }
+
 // ======================= CLASS: Character =======================
 
 // Constructor utilizes an initializer list to set all common attributes of a person
@@ -59,10 +206,10 @@ WordRow Victim::getRow() const { return clueRowChar; }
 
 // ======================= CLASS: Detective =======================
 
-// The detective starts with full credibility and zero turns
+// The detective starts with full credibility, zero turns and an empty rack of 15 letters
 Detective::Detective(string name, int startCredibility)
     : Character(name, "Detective", "", false),
-    credibility(startCredibility), turns(0), solvedWords("")
+    credibility(startCredibility), turns(0), solvedWords(""), rack(15)
 {
 }
 
@@ -91,6 +238,9 @@ void Detective::useTurn() { turns++; }
 
 int Detective::getCredibility() const { return credibility; }
 int Detective::getTurns() const { return turns; }
+
+// Returns the rack by reference, so that the GameEngine can add letters to the rack of the detective
+TileRack& Detective::getRack() { return rack; }
 
 // ======================= CLASS: Suspect =======================
 
