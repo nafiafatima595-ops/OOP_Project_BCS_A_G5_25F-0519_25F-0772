@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="LockerHeist.vcxproj" Id="42262846-2cb0-4cbf-b687-69925ec7e7b6" />
+</Solution>
